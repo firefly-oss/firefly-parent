@@ -52,5 +52,5 @@ No need to declare `fireflyframework.bom.version` or import the `fireflyframewor
 
 ## Related
 
-- [fireflyframework-parent](https://github.com/nicatorr/fireflyframework) - The upstream framework parent (Spring Boot, plugins, etc.)
-- [firefly-bom](../firefly-bom) - Bill of Materials for all `com.firefly` artifacts
+- [fireflyframework-parent](https://github.com/fireflyframework/fireflyframework-parent) - The upstream framework parent (Spring Boot, plugins, etc.)
+- [firefly-bom](https://github.com/firefly-oss/firefly-bom) - Bill of Materials for all `com.firefly` artifacts
