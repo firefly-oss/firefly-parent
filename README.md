@@ -1,31 +1,24 @@
 # Firefly Parent POM
 
-Parent POM for all **Firefly OpenCore Banking Platform** modules. It centralises dependency versions, plugin configuration, and shared build properties so that every child module inherits a consistent, tested baseline.
+Parent POM for all **Firefly OpenCore Banking Platform** modules. It extends `org.fireflyframework:fireflyframework-parent` (which already manages Spring Boot, Spring Cloud, Lombok, MapStruct, and all other third-party dependency and plugin versions) and adds the Firefly-specific configuration on top.
 
 ## What It Provides
 
 | Concern | Description |
 |---------|-------------|
-| **Dependency management** | Versions for Spring Boot, Spring Cloud, database drivers, OpenAPI tooling, mapping, testing, and logging libraries |
-| **Plugin management** | Pre-configured Maven plugins for compilation, deployment, code generation, source/javadoc packaging, and Spring Boot repackaging |
-| **Shared properties** | Java version, encoding, OpenAPI code-gen conventions, and library versions used across the platform |
+| **Firefly Framework BOM** | Imports `org.fireflyframework:fireflyframework-bom` so that all `org.fireflyframework` artifact versions are managed centrally |
+| **Framework version** | Single source of truth for `fireflyframework.bom.version` (currently **26.02.01**) |
+| **Project conventions** | Shared OpenAPI code-gen properties (`base.package`, model/api package layout) |
 
-## Key Managed Versions
+All third-party dependency versions (Spring Boot, Lombok, MapStruct, database drivers, testing frameworks, etc.) and plugin management are inherited from `fireflyframework-parent`. There is no need to redeclare them here.
 
-| Dependency | Version |
-|------------|---------|
-| Java | 21 |
-| Spring Boot | 3.2.2 |
-| Spring Cloud | 2023.0.0 |
-| SpringDoc OpenAPI | 2.3.0 |
-| PostgreSQL Driver | 42.7.1 |
-| R2DBC PostgreSQL | 1.0.4.RELEASE |
-| Flyway | 9.22.3 |
-| OpenAPI Generator | 7.2.0 |
-| MapStruct | 1.5.5.Final |
-| Lombok | 1.18.30 |
-| JUnit Jupiter | 5.10.1 |
-| Testcontainers | 1.19.3 |
+## Inheritance Chain
+
+```
+org.fireflyframework:fireflyframework-parent  (Spring Boot, Lombok, plugins, …)
+  └── com.firefly:firefly-parent              (fireflyframework BOM + project conventions)
+        └── your module                       (inherits everything)
+```
 
 ## Usage
 
@@ -40,27 +33,24 @@ Reference `firefly-parent` as the parent in your module's `pom.xml`:
 </parent>
 ```
 
-All managed dependency and plugin versions are then available without explicit `<version>` tags.
+Your module then inherits:
+- All `org.fireflyframework` dependency versions (via the BOM at **26.02.01**)
+- All third-party dependency and plugin versions from `fireflyframework-parent`
+- Firefly OpenAPI code-generation conventions
 
-## Managed Plugins
+No need to declare `fireflyframework.bom.version` or import the `fireflyframework-bom` in your module — the parent handles it.
 
-| Plugin | Purpose |
-|--------|---------|
-| `maven-compiler-plugin` | Java 21 compilation with Lombok + MapStruct annotation processing |
-| `maven-deploy-plugin` | Artifact deployment to remote repositories |
-| `openapi-generator-maven-plugin` | Server/client code generation from OpenAPI specs |
-| `maven-source-plugin` | Source JAR packaging |
-| `maven-javadoc-plugin` | Javadoc JAR packaging |
-| `spring-boot-maven-plugin` | Spring Boot fat-JAR repackaging (excludes Lombok) |
+## Properties
 
-## Project Structure
-
-```
-firefly-parent/
-  pom.xml          # This parent POM
-  README.md        # This file
-```
+| Property | Value | Purpose |
+|----------|-------|---------|
+| `fireflyframework.bom.version` | `26.02.01` | Version of the Firefly Framework BOM |
+| `base.package` | `com.firefly` | Root Java package for all modules |
+| `openapi.base.package` | `${base.package}.${project.artifactId}` | OpenAPI code-gen base package |
+| `openapi.model.package` | `…interfaces.dto` | Generated DTO package |
+| `openapi.api.package` | `…interfaces.api` | Generated API package |
 
 ## Related
 
-- [firefly-bom](../firefly-bom) - Bill of Materials for all Firefly artifacts
+- [fireflyframework-parent](https://github.com/nicatorr/fireflyframework) - The upstream framework parent (Spring Boot, plugins, etc.)
+- [firefly-bom](../firefly-bom) - Bill of Materials for all `com.firefly` artifacts
