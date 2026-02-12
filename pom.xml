@@ -20,7 +20,7 @@
 
     <properties>
         <!-- Firefly Framework BOM version (single source of truth) -->
-        <fireflyframework.bom.version>26.02.03</fireflyframework.bom.version>
+        <fireflyframework.bom.version>26.02.04</fireflyframework.bom.version>
 
         <!-- Firefly project conventions -->
         <base.package>com.firefly</base.package>
