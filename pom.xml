@@ -20,7 +20,7 @@
 
     <properties>
         <!-- Firefly Framework BOM version (single source of truth) -->
-        <fireflyframework.bom.version>26.02.04</fireflyframework.bom.version>
+        <fireflyframework.bom.version>26.02.06</fireflyframework.bom.version>
 
         <!-- Firefly project conventions -->
         <base.package>com.firefly</base.package>
@@ -31,6 +31,9 @@
         <openapi.use.tags>true</openapi.use.tags>
         <openapi.use.optional>true</openapi.use.optional>
         <openapi.date.library>java8</openapi.date.library>
+
+        <!-- OpenAPI generation: skipped by default. Set to false in -web modules to enable. -->
+        <openapi.gen.skip>true</openapi.gen.skip>
     </properties>
 
     <dependencyManagement>
@@ -54,4 +57,86 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <profiles>
+        <!--
+            Shared OpenAPI generation profile.
+            Always active unless -DskipOpenApiGen is passed.
+            Plugin executions are controlled by openapi.gen.skip (true by default).
+            Each -web module sets openapi.gen.skip=false and openapi.gen.mainClass.
+        -->
+        <profile>
+            <id>generate-openapi</id>
+            <activation>
+                <property>
+                    <name>!skipOpenApiGen</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- Start the lightweight OpenApiGenApplication to expose the spec -->
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>openapi-start</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>start</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>${openapi.gen.skip}</skip>
+                                    <mainClass>${openapi.gen.mainClass}</mainClass>
+                                    <useTestClasspath>true</useTestClasspath>
+                                    <additionalClasspathElements>
+                                        <additionalClasspathElement>${project.build.testOutputDirectory}</additionalClasspathElement>
+                                    </additionalClasspathElements>
+                                    <profiles>
+                                        <profile>openapi-gen</profile>
+                                    </profiles>
+                                    <arguments>
+                                        <argument>--server.port=18080</argument>
+                                    </arguments>
+                                    <jvmArguments>--add-opens java.base/java.lang=ALL-UNNAMED</jvmArguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>openapi-stop</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>stop</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>${openapi.gen.skip}</skip>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- Fetch the OpenAPI spec from the running app and write it to target/ -->
+                    <plugin>
+                        <groupId>org.springdoc</groupId>
+                        <artifactId>springdoc-openapi-maven-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>generate-openapi-spec</id>
+                                <phase>integration-test</phase>
+                                <goals>
+                                    <goal>generate</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <skip>${openapi.gen.skip}</skip>
+                            <apiDocsUrl>http://localhost:18080/v3/api-docs.yaml</apiDocsUrl>
+                            <outputDir>${project.build.directory}/openapi</outputDir>
+                            <outputFileName>openapi.yml</outputFileName>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
