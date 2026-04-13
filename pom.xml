@@ -34,6 +34,7 @@
 
         <!-- OpenAPI generation: skipped by default. Set to false in -web modules to enable. -->
         <openapi.gen.skip>true</openapi.gen.skip>
+        <openapi.gen.outputDir>${project.parent.basedir}/${project.parent.artifactId}-sdk/src/main/resources</openapi.gen.outputDir>
     </properties>
 
     <dependencyManagement>
@@ -114,7 +115,7 @@
                         </executions>
                     </plugin>
 
-                    <!-- Fetch the OpenAPI spec from the running app and write it to target/ -->
+                    <!-- Fetch the OpenAPI spec from the running app and write it to the SDK module resources -->
                     <plugin>
                         <groupId>org.springdoc</groupId>
                         <artifactId>springdoc-openapi-maven-plugin</artifactId>
@@ -131,7 +132,7 @@
                         <configuration>
                             <skip>${openapi.gen.skip}</skip>
                             <apiDocsUrl>http://localhost:18080/v3/api-docs.yaml</apiDocsUrl>
-                            <outputDir>${project.build.directory}/openapi</outputDir>
+                            <outputDir>${openapi.gen.outputDir}</outputDir>
                             <outputFileName>openapi.yml</outputFileName>
                         </configuration>
                     </plugin>
