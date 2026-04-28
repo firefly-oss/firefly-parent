@@ -36,6 +36,10 @@
         <!-- OpenAPI generation: skipped by default. Set to false in -web modules to enable. -->
         <openapi.gen.skip>true</openapi.gen.skip>
         <openapi.gen.outputDir>${project.parent.basedir}/${project.parent.artifactId}-sdk/src/main/resources</openapi.gen.outputDir>
+
+        <!-- Container image build (Paketo Buildpacks). Activated via -Pbuild-image. -->
+        <docker.image.prefix>ghcr.io/firefly-oss</docker.image.prefix>
+        <docker.image.platform>linux/arm64</docker.image.platform>
     </properties>
 
     <dependencyManagement>
@@ -61,6 +65,38 @@
     </dependencyManagement>
 
     <profiles>
+        <!--
+            Container image build profile (Paketo Buildpacks).
+            Activated explicitly with -Pbuild-image. Inactive by default.
+            Each -web module inherits the spring-boot-maven-plugin configuration.
+        -->
+        <profile>
+            <id>build-image</id>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-maven-plugin</artifactId>
+                            <configuration>
+                                <image>
+                                    <builder>paketobuildpacks/builder-noble-java-tiny</builder>
+                                    <name>${docker.image.prefix}/${project.artifactId}:${project.version}</name>
+                                    <imagePlatform>${docker.image.platform}</imagePlatform>
+                                    <env>
+                                        <BP_JVM_VERSION>25</BP_JVM_VERSION>
+                                    </env>
+                                    <tags>
+                                        <tag>${docker.image.prefix}/${project.artifactId}:latest</tag>
+                                    </tags>
+                                </image>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+
         <!--
             Shared OpenAPI generation profile.
             Always active unless -DskipOpenApiGen is passed.
