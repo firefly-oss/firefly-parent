@@ -40,6 +40,11 @@
         <!-- Container image build (Paketo Buildpacks). Activated via -Pbuild-image. -->
         <docker.image.prefix>ghcr.io/firefly-oss</docker.image.prefix>
         <docker.image.platform>linux/arm64</docker.image.platform>
+
+        <!-- OCI source label. Set to https://github.com/{owner}/{repo} from CI to
+             auto-link the GHCR package to its source repo. Empty by default so
+             local builds don't fail. -->
+        <oci.source/>
     </properties>
 
     <dependencyManagement>
@@ -85,6 +90,7 @@
                                     <imagePlatform>${docker.image.platform}</imagePlatform>
                                     <env>
                                         <BP_JVM_VERSION>25</BP_JVM_VERSION>
+                                        <BP_OCI_SOURCE>${oci.source}</BP_OCI_SOURCE>
                                     </env>
                                     <tags>
                                         <tag>${docker.image.prefix}/${project.artifactId}:latest</tag>
