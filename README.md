@@ -7,7 +7,7 @@ Parent POM for all **Firefly OpenCore Banking Platform** modules. It extends `or
 | Concern | Description |
 |---------|-------------|
 | **Firefly Framework BOM** | Imports `org.fireflyframework:fireflyframework-bom` so that all `org.fireflyframework` artifact versions are managed centrally |
-| **Framework version** | Single source of truth for `fireflyframework.bom.version` (currently **26.02.06**) |
+| **Framework version** | Single source of truth for `fireflyframework.bom.version` (currently **26.04.03**) |
 | **Project conventions** | Shared OpenAPI code-gen properties (`base.package`, model/api package layout) |
 
 All third-party dependency versions (Spring Boot, Lombok, MapStruct, database drivers, testing frameworks, etc.) and plugin management are inherited from `fireflyframework-parent`. There is no need to redeclare them here.
@@ -34,7 +34,7 @@ Reference `firefly-parent` as the parent in your module's `pom.xml`:
 ```
 
 Your module then inherits:
-- All `org.fireflyframework` dependency versions (via the BOM at **26.02.06**)
+- All `org.fireflyframework` dependency versions (via the BOM at **26.04.03**)
 - All third-party dependency and plugin versions from `fireflyframework-parent`
 - Firefly OpenAPI code-generation conventions
 
@@ -44,7 +44,7 @@ No need to declare `fireflyframework.bom.version` or import the `fireflyframewor
 
 | Property | Value | Purpose |
 |----------|-------|---------|
-| `fireflyframework.bom.version` | `26.02.06` | Version of the Firefly Framework BOM |
+| `fireflyframework.bom.version` | `26.04.03` | Version of the Firefly Framework BOM |
 | `base.package` | `com.firefly` | Root Java package for all modules |
 | `openapi.base.package` | `${base.package}.${project.artifactId}` | OpenAPI code-gen base package |
 | `openapi.model.package` | `…interfaces.dto` | Generated DTO package |
