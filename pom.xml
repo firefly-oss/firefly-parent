@@ -7,12 +7,13 @@
     <parent>
         <groupId>org.fireflyframework</groupId>
         <artifactId>fireflyframework-parent</artifactId>
-        <version>26.04.02</version>
+        <version>26.04.03</version>
         <relativePath/>
     </parent>
 
     <groupId>com.firefly</groupId>
     <artifactId>firefly-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Firefly Parent POM</name>
@@ -20,7 +21,7 @@
 
     <properties>
         <!-- Firefly Framework BOM version (single source of truth) -->
-        <fireflyframework.bom.version>26.04.02</fireflyframework.bom.version>
+        <fireflyframework.bom.version>26.04.03</fireflyframework.bom.version>
 
         <!-- Firefly project conventions -->
         <base.package>com.firefly</base.package>
