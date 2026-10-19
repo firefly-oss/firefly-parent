@@ -175,7 +175,6 @@ Prefer dependency order **core → domain → exp** for the same capability:
 | `exp-*` (accounts, cards, channel-management, distributor, lending, notifications, onboarding, profile, security) | **Green** | SDK recipe; WebFluxTest / `@MockitoBean` / reactive security excludes |
 | `library-psps`, `library-rails` | **N/A (deferred)** | Still on `resilience4j-spring-boot3`; no OpenAPI SDK; out of this cutover |
 | `app-authenticator`, `app-configurator-masters` | **N/A (deferred)** | Thin apps; bump with consumer cutover |
-| `administration-backoffice`, `operations-backoffice` | **N/A** | Vaadin 24 + `spring-boot-starter-parent` stack — separate Boot 4 / Vaadin track |
 
 Verify a service with: `JAVA_HOME=$(/usr/libexec/java_home -v 25) mvn -B -ntp clean test -DskipOpenApiGen`.
 
