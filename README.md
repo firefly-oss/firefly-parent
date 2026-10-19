@@ -7,7 +7,7 @@ Parent POM for all **Firefly OpenCore Banking Platform** modules. It extends `or
 | Concern | Description |
 |---------|-------------|
 | **Firefly Framework BOM** | Imports `org.fireflyframework:fireflyframework-bom` so that all `org.fireflyframework` artifact versions are managed centrally |
-| **Framework version** | Single source of truth for `fireflyframework.bom.version` (currently **26.04.03**) |
+| **Framework version** | Single source of truth for `fireflyframework.bom.version` (currently **26.10.19**, Spring Boot 4.1.1) |
 | **Project conventions** | Shared OpenAPI code-gen properties (`base.package`, model/api package layout) |
 
 All third-party dependency versions (Spring Boot, Lombok, MapStruct, database drivers, testing frameworks, etc.) and plugin management are inherited from `fireflyframework-parent`. There is no need to redeclare them here.
@@ -34,17 +34,19 @@ Reference `firefly-parent` as the parent in your module's `pom.xml`:
 ```
 
 Your module then inherits:
-- All `org.fireflyframework` dependency versions (via the BOM at **26.04.03**)
+- All `org.fireflyframework` dependency versions (via the BOM at **26.10.19**)
 - All third-party dependency and plugin versions from `fireflyframework-parent`
 - Firefly OpenAPI code-generation conventions
 
 No need to declare `fireflyframework.bom.version` or import the `fireflyframework-bom` in your module — the parent handles it.
 
+**Maven Central** hosts `26.10.19` (`https://repo1.maven.org/maven2/org/fireflyframework/fireflyframework-parent/26.10.19/`). No extra repository is required for OpenPlatform builds that can reach Central. For air-gapped or pre-sync CI, use a local `./mvnw install` of `fireflyframework-jafly`, or activate `-Pjafly-packages` for GitHub Packages (`https://maven.pkg.github.com/fireflyframework/fireflyframework-jafly`) with `read:packages` credentials for Maven server id `firefly-github`.
+
 ## Properties
 
 | Property | Value | Purpose |
 |----------|-------|---------|
-| `fireflyframework.bom.version` | `26.04.03` | Version of the Firefly Framework BOM |
+| `fireflyframework.bom.version` | `26.10.19` | Version of the Firefly Framework BOM (Boot 4.1.1 train) |
 | `base.package` | `com.firefly` | Root Java package for all modules |
 | `openapi.base.package` | `${base.package}.${project.artifactId}` | OpenAPI code-gen base package |
 | `openapi.model.package` | `…interfaces.dto` | Generated DTO package |
@@ -105,7 +107,80 @@ The generated spec will be at `your-module-web/target/openapi/openapi.yml`. To s
 | `openapi.gen.skip` | `true` | Set to `false` in `-web` modules to enable generation |
 | `openapi.gen.mainClass` | _(none)_ | Fully qualified class name of the `OpenApiGenApplication` |
 
+## Consuming jafly 26.10.19 (OpenPlatform)
+
+| Item | Value |
+|------|-------|
+| Framework parent / BOM | `org.fireflyframework:fireflyframework-parent` / `fireflyframework-bom` **26.10.19** |
+| Spring Boot | **4.1.1** |
+| Spring Cloud | **2025.1.3** |
+| Java | **25** (`JAVA_HOME` must be JDK 25; Maven on JDK 26 will fail toolchain/source checks) |
+| Registry | **Maven Central first** — no extra `<repository>` required when Central is reachable |
+
+### Resolve the framework from Central
+
+```xml
+<!-- Already done by firefly-parent — do not re-pin in service POMs -->
+<parent>
+    <groupId>org.fireflyframework</groupId>
+    <artifactId>fireflyframework-parent</artifactId>
+    <version>26.10.19</version>
+    <relativePath/>
+</parent>
+```
+
+Central coordinates: `https://repo1.maven.org/maven2/org/fireflyframework/fireflyframework-parent/26.10.19/`.
+
+### Dual-repo profile (optional GitHub Packages)
+
+Activate only when Central is unreachable (air-gapped / pre-sync CI):
+
+```bash
+mvn -Pjafly-packages …   # server id firefly-github, PAT with read:packages
+```
+
+Prefer Central for **26.10.19+**. Leave `-Pjafly-packages` off by default. Alternative: `./mvnw install` from a local `fireflyframework-jafly` checkout.
+
+### Boot 4 / OpenAPI regeneration notes
+
+When bumping a service onto this parent:
+
+1. Install `firefly-parent:1.0.0-SNAPSHOT` (this repo) so the BOM pin is **26.10.19**.
+2. In each `-sdk` module: drop hardcoded `openapi-generator.version` / Jackson / swagger pins; inherit plugin + dependency versions from `fireflyframework-parent`; set `useJakartaEe=true` on the webclient generator; keep `javax.annotation-api` only while the generator still emits `javax.annotation.Generated`; add `spring-webflux` for the WebClient SDK runtime.
+3. Apply Boot 4 config migrations from the [jafly Boot 4 guide](https://github.com/fireflyframework/fireflyframework-jafly/blob/main/docs/migration/boot4-application-guide.md) where used: `spring.jackson2.*` (not `spring.jackson.*`), OTLP tracing keys, Testcontainers 2 module names, springdoc 3.x.
+4. Regenerate OpenAPI via the parent `generate-openapi` profile (`openapi.gen.skip=false` on `-web`); skip with `-DskipOpenApiGen` when iterating compile-only.
+5. Verify with JDK 25: `mvn -B -ntp clean test`.
+
+### Roll-out order
+
+Prefer dependency order **core → domain → exp** for the same capability:
+
+1. Shared libraries (`library-*`) and `core-common-*`
+2. Capability cores (`core-lending-*`, `core-banking-*`, …)
+3. Domain aggregators (`domain-*`)
+4. Experience APIs (`exp-*`)
+
+### Roll-out status (2026-10-18/19)
+
+**Train:** jafly **26.10.19** / Spring Boot **4.1.1** / Java **25** — consumed from **Maven Central** (optional `-Pjafly-packages` fallback).
+
+| Layer | Status | Notes |
+|-------|--------|-------|
+| `firefly-parent` | **Green** | Parent + BOM pin `26.10.19` |
+| `library-common-batch` | **Green** | Boot 4 Flyway auto-config fixes |
+| `core-common-*` | **Green** | All SDK modules unpinned + verified |
+| `core-lending-*` | **Green** | All SDK modules unpinned + verified |
+| `core-banking-*` | **Green** | Includes `core-banking-psdx` Boot 4 error/security fixes |
+| `domain-*` (banking, lending, common, product, customer, distributor, core, data) | **Green** | SDK recipe + Boot 4 test fixes as needed |
+| `exp-*` (accounts, cards, channel-management, distributor, lending, notifications, onboarding, profile, security) | **Green** | SDK recipe; WebFluxTest / `@MockitoBean` / reactive security excludes |
+| `library-psps`, `library-rails` | **N/A (deferred)** | Still on `resilience4j-spring-boot3`; no OpenAPI SDK; out of this cutover |
+| `app-authenticator`, `app-configurator-masters` | **N/A (deferred)** | Thin apps; bump with consumer cutover |
+| `administration-backoffice`, `operations-backoffice` | **N/A** | Vaadin 24 + `spring-boot-starter-parent` stack — separate Boot 4 / Vaadin track |
+
+Verify a service with: `JAVA_HOME=$(/usr/libexec/java_home -v 25) mvn -B -ntp clean test -DskipOpenApiGen`.
+
 ## Related
 
-- [fireflyframework-parent](https://github.com/fireflyframework/fireflyframework-parent) - The upstream framework parent (Spring Boot, plugins, etc.)
+- [fireflyframework-jafly](https://github.com/fireflyframework/fireflyframework-jafly) - Unified Firefly Framework (parent, BOM, libraries)
+- [Boot 4 application migration guide](https://github.com/fireflyframework/fireflyframework-jafly/blob/main/docs/migration/boot4-application-guide.md)
 - [firefly-bom](https://github.com/firefly-oss/firefly-bom) - Bill of Materials for all `com.firefly` artifacts
