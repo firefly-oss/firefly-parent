@@ -252,6 +252,9 @@
                         <configuration>
                             <flattenMode>ossrh</flattenMode>
                             <updatePomFile>true</updatePomFile>
+                            <pomElements>
+                                <dependencies>resolve</dependencies>
+                            </pomElements>
                         </configuration>
                         <executions>
                             <execution>
