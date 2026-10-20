@@ -7,13 +7,13 @@
     <parent>
         <groupId>org.fireflyframework</groupId>
         <artifactId>fireflyframework-parent</artifactId>
-        <version>26.10.19</version>
+        <version>26.10.20</version>
         <relativePath/>
     </parent>
 
     <groupId>com.firefly</groupId>
     <artifactId>firefly-parent</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.2.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Firefly OpenPlatform Parent POM</name>
@@ -22,7 +22,7 @@
 
     <properties>
         <!-- Firefly Framework BOM version (single source of truth) -->
-        <fireflyframework.bom.version>26.10.19</fireflyframework.bom.version>
+        <fireflyframework.bom.version>26.10.20</fireflyframework.bom.version>
 
         <!-- Firefly project conventions -->
         <base.package>com.firefly</base.package>
@@ -63,7 +63,7 @@
             <dependency>
                 <groupId>com.firefly</groupId>
                 <artifactId>firefly-bom</artifactId>
-                <version>1.1.0-SNAPSHOT</version>
+                <version>1.2.0-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -75,7 +75,7 @@
           Optional GitHub Packages mirror when Maven Central is unreachable.
           Activate with -Pjafly-packages. Requires a PAT with read:packages in
           settings.xml server id firefly-github (or CI GITHUB_TOKEN).
-          Prefer Central for 26.10.19+; leave this profile off by default.
+          Prefer Central for 26.10.20+; leave this profile off by default.
         -->
         <profile>
             <id>jafly-packages</id>
