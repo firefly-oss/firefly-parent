@@ -35,9 +35,9 @@
         </developer>
     </developers>
     <scm child.scm.connection.inherit.append.path="false" child.scm.developerConnection.inherit.append.path="false" child.scm.url.inherit.append.path="false">
-        <connection>scm:git:https://github.com/firefly-oss/${openplatform.repository}.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/firefly-oss/${openplatform.repository}.git</developerConnection>
-        <url>https://github.com/firefly-oss/${openplatform.repository}</url>
+        <connection>scm:git:https://github.com/fireflysoftwaresolutions/${openplatform.repository}.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/fireflysoftwaresolutions/${openplatform.repository}.git</developerConnection>
+        <url>https://github.com/fireflysoftwaresolutions/${openplatform.repository}</url>
     </scm>
 
     <properties>
