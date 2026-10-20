@@ -11,21 +11,42 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.firefly</groupId>
+    <groupId>io.fireflysoftware</groupId>
     <artifactId>firefly-parent</artifactId>
-    <version>26.10.2</version>
+    <version>26.10.3</version>
     <packaging>pom</packaging>
 
     <name>Firefly OpenPlatform Parent POM</name>
     <description>Parent POM for Firefly OpenPlatform modules. Extends fireflyframework-parent and centralises the Firefly Framework BOM version. Modules cover shared capabilities and the banking, lending, and insurance industries.</description>
     <url>https://openplatform.fireflysoftware.io</url>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <name>Firefly Software Foundation</name>
+            <email>dev@fireflysoftware.io</email>
+            <organization>Firefly Software Foundation</organization>
+            <organizationUrl>https://fireflysoftware.io</organizationUrl>
+        </developer>
+    </developers>
+    <scm child.scm.connection.inherit.append.path="false" child.scm.developerConnection.inherit.append.path="false" child.scm.url.inherit.append.path="false">
+        <connection>scm:git:https://github.com/firefly-oss/${openplatform.repository}.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/firefly-oss/${openplatform.repository}.git</developerConnection>
+        <url>https://github.com/firefly-oss/${openplatform.repository}</url>
+    </scm>
 
     <properties>
         <!-- Firefly Framework BOM version (single source of truth) -->
         <fireflyframework.bom.version>26.10.20</fireflyframework.bom.version>
 
         <!-- Firefly project conventions -->
-        <base.package>com.firefly</base.package>
+        <openplatform.repository>${project.artifactId}</openplatform.repository>
+        <base.package>io.fireflysoftware</base.package>
         <openapi.base.package>${base.package}.${project.artifactId}</openapi.base.package>
         <openapi.model.package>${openapi.base.package}.interfaces.dto</openapi.model.package>
         <openapi.api.package>${openapi.base.package}.interfaces.api</openapi.api.package>
@@ -59,11 +80,11 @@
                 <scope>import</scope>
             </dependency>
 
-            <!-- Firefly Platform BOM — pins all com.firefly artifact versions -->
+            <!-- Firefly Platform BOM — pins all io.fireflysoftware artifact versions -->
             <dependency>
-                <groupId>com.firefly</groupId>
+                <groupId>io.fireflysoftware</groupId>
                 <artifactId>firefly-bom</artifactId>
-                <version>26.10.2</version>
+                <version>26.10.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -213,6 +234,87 @@
                             <apiDocsUrl>http://localhost:18080/v3/api-docs.yaml</apiDocsUrl>
                             <outputDir>${openapi.gen.outputDir}</outputDir>
                             <outputFileName>openapi.yml</outputFileName>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- Sources and javadoc jars required by Maven Central. Inactive unless -Prelease. -->
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.4.0</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.12.0</version>
+                        <configuration>
+                            <doclint>none</doclint>
+                            <failOnError>false</failOnError>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- Central Portal publish. Activate with -Pmaven-central after the namespace is verified. -->
+        <profile>
+            <id>maven-central</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>3.2.8</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                                <configuration>
+                                    <gpgArguments>
+                                        <arg>--pinentry-mode</arg>
+                                        <arg>loopback</arg>
+                                    </gpgArguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.12.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                            <autoPublish>true</autoPublish>
+                            <waitUntil>published</waitUntil>
+                            <waitMaxTime>3600</waitMaxTime>
+                            <checksums>required</checksums>
                         </configuration>
                     </plugin>
                 </plugins>

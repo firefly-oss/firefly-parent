@@ -29,7 +29,7 @@ All third-party dependency versions (Spring Boot, Lombok, MapStruct, database dr
 
 ```
 org.fireflyframework:fireflyframework-parent  (Spring Boot, Lombok, plugins, …)
-  └── com.firefly:firefly-parent              (fireflyframework BOM + project conventions)
+  └── io.fireflysoftware:firefly-parent              (fireflyframework BOM + project conventions)
         └── your module                       (inherits everything)
 ```
 
@@ -39,9 +39,9 @@ Reference `firefly-parent` as the parent in your module's `pom.xml`:
 
 ```xml
 <parent>
-    <groupId>com.firefly</groupId>
+    <groupId>io.fireflysoftware</groupId>
     <artifactId>firefly-parent</artifactId>
-    <version>26.10.2</version>
+    <version>26.10.3</version>
     <relativePath/>
 </parent>
 ```
@@ -60,7 +60,7 @@ No need to declare `fireflyframework.bom.version` or import the `fireflyframewor
 | Property | Value | Purpose |
 |----------|-------|---------|
 | `fireflyframework.bom.version` | `26.10.20` | Version of the Firefly Framework BOM (Boot 4.1.1 train) |
-| `base.package` | `com.firefly` | Root Java package for all modules |
+| `base.package` | `io.fireflysoftware` | Root Java package for all modules |
 | `openapi.base.package` | `${base.package}.${project.artifactId}` | OpenAPI code-gen base package |
 | `openapi.model.package` | `…interfaces.dto` | Generated DTO package |
 | `openapi.api.package` | `…interfaces.api` | Generated API package |
@@ -87,7 +87,7 @@ The `-sdk` module then uses `openapi-generator-maven-plugin` to generate typed A
 ```xml
 <properties>
     <openapi.gen.skip>false</openapi.gen.skip>
-    <openapi.gen.mainClass>com.firefly.your.module.web.openapi.OpenApiGenApplication</openapi.gen.mainClass>
+    <openapi.gen.mainClass>io.fireflysoftware.your.module.web.openapi.OpenApiGenApplication</openapi.gen.mainClass>
 </properties>
 ```
 
@@ -95,7 +95,7 @@ The `-sdk` module then uses `openapi-generator-maven-plugin` to generate typed A
 
 ```java
 @EnableOpenApiGen
-@ComponentScan(basePackages = "com.firefly.your.module.web.controllers")
+@ComponentScan(basePackages = "io.fireflysoftware.your.module.web.controllers")
 public class OpenApiGenApplication {
     public static void main(String[] args) {
         SpringApplication.run(OpenApiGenApplication.class, args);
@@ -158,7 +158,7 @@ Prefer Central for **26.10.20+**. Leave `-Pjafly-packages` off by default. Alter
 
 When bumping a service onto this parent:
 
-1. Install `firefly-parent:26.10.2` (this repo) so the BOM pin is **26.10.20**.
+1. Install `firefly-parent:26.10.3` (this repo) so the BOM pin is **26.10.20**.
 2. In each `-sdk` module: drop hardcoded `openapi-generator.version` / Jackson / swagger pins; inherit plugin + dependency versions from `fireflyframework-parent`; set `useJakartaEe=true` on the webclient generator; keep `javax.annotation-api` only while the generator still emits `javax.annotation.Generated`; add `spring-webflux` for the WebClient SDK runtime.
 3. Apply Boot 4 config migrations from the [jafly Boot 4 guide](https://github.com/fireflyframework/fireflyframework-jafly/blob/main/docs/migration/boot4-application-guide.md) where used: `spring.jackson2.*` (not `spring.jackson.*`), OTLP tracing keys, Testcontainers 2 module names, springdoc 3.x.
 4. Regenerate OpenAPI via the parent `generate-openapi` profile (`openapi.gen.skip=false` on `-web`); skip with `-DskipOpenApiGen` when iterating compile-only.
@@ -195,4 +195,4 @@ Verify a service with: `JAVA_HOME=$(/usr/libexec/java_home -v 25) mvn -B -ntp cl
 
 - [fireflyframework-jafly](https://github.com/fireflyframework/fireflyframework-jafly) - Unified Firefly Framework (parent, BOM, libraries)
 - [Boot 4 application migration guide](https://github.com/fireflyframework/fireflyframework-jafly/blob/main/docs/migration/boot4-application-guide.md)
-- [firefly-bom](https://github.com/firefly-oss/firefly-bom) - Bill of Materials for all `com.firefly` artifacts
+- [firefly-bom](https://github.com/firefly-oss/firefly-bom) - Bill of Materials for all `io.fireflysoftware` artifacts
