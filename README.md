@@ -1,6 +1,6 @@
 # Firefly Parent POM
 
-Parent POM for all **Firefly OpenCore Banking Platform** modules. It extends `org.fireflyframework:fireflyframework-parent` (which already manages Spring Boot, Spring Cloud, Lombok, MapStruct, and all other third-party dependency and plugin versions) and adds the Firefly-specific configuration on top.
+Parent POM for all **Firefly OpenPlatform** modules. It extends `org.fireflyframework:fireflyframework-parent` (which already manages Spring Boot, Spring Cloud, Lombok, MapStruct, and all other third-party dependency and plugin versions) and adds the Firefly-specific configuration on top. Banking, lending, and insurance modules share this parent.
 
 ## What It Provides
 
