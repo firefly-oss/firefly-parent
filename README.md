@@ -41,7 +41,7 @@ Reference `firefly-parent` as the parent in your module's `pom.xml`:
 <parent>
     <groupId>io.fireflysoftware</groupId>
     <artifactId>firefly-parent</artifactId>
-    <version>26.10.3</version>
+    <version>26.10.4</version>
     <relativePath/>
 </parent>
 ```
@@ -158,7 +158,7 @@ Prefer Central for **26.10.20+**. Leave `-Pjafly-packages` off by default. Alter
 
 When bumping a service onto this parent:
 
-1. Install `firefly-parent:26.10.3` (this repo) so the BOM pin is **26.10.20**.
+1. Install `firefly-parent:26.10.4` (this repo) so the BOM pin is **26.10.20**.
 2. In each `-sdk` module: drop hardcoded `openapi-generator.version` / Jackson / swagger pins; inherit plugin + dependency versions from `fireflyframework-parent`; set `useJakartaEe=true` on the webclient generator; keep `javax.annotation-api` only while the generator still emits `javax.annotation.Generated`; add `spring-webflux` for the WebClient SDK runtime.
 3. Apply Boot 4 config migrations from the [jafly Boot 4 guide](https://github.com/fireflyframework/fireflyframework-jafly/blob/main/docs/migration/boot4-application-guide.md) where used: `spring.jackson2.*` (not `spring.jackson.*`), OTLP tracing keys, Testcontainers 2 module names, springdoc 3.x.
 4. Regenerate OpenAPI via the parent `generate-openapi` profile (`openapi.gen.skip=false` on `-web`); skip with `-DskipOpenApiGen` when iterating compile-only.
